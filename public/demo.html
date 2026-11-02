@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#F3F7FF">
+  <meta name="description" content="Watch Counterparty Desk read payment roles, exact source evidence, and newly edited terms through three live Clocked endpoints.">
+  <title>Counterparty Desk — demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
+  <style>
+    .film { width:min(1100px,calc(100% - 48px)); margin:48px auto 64px; }
+    .film h1 { font-size:clamp(27px,4vw,43px); letter-spacing:-.055em; line-height:1.2; max-width:24ch; margin-bottom:18px; }
+    .film p { max-width:78ch; font-size:14px; line-height:1.8; color:var(--muted); }
+    .film video { display:block; width:100%; aspect-ratio:16/9; margin:28px 0 18px; background:#17233e; }
+    .film nav { display:flex; flex-wrap:wrap; gap:24px; margin:28px 0; }
+    .film a { color:var(--blue); font-weight:700; text-underline-offset:4px; }
+    .film .caption { font-size:12px; }
+    @media(max-width:600px) { .film{margin-top:32px;} .film video{width:calc(100% + 48px);max-width:none;margin-left:-24px;} }
+  </style>
+</head>
+<body>
+  <main class="film">
+    <h1>Read the deal before work starts.</h1>
+    <p>Counterparty Desk puts the offer, the reply’s payment understanding, and the exact source words together. Watch a refusal, a counteroffer, and a newly edited thread reviewed live through Clocked.</p>
+    <video controls preload="metadata" playsinline poster="./demo-poster.jpg">
+      <source src="./counterparty-desk-demo.mp4" type="video/mp4">
+      <track kind="subtitles" srclang="en" label="English" src="./counterparty-desk-demo.vtt">
+      <p><a href="./counterparty-desk-demo.mp4">Download the demo</a></p>
+    </video>
+    <p class="caption">Real app screen capture with synthetic narration. All conversations and names are fictional. Recorded native examples surround one local review that makes three live Clocked calls.</p>
+    <nav aria-label="Explore Counterparty Desk"><a href="./">Open the desk</a><a href="https://github.com/blucca/counterparty-desk#readme">Source and local setup</a></nav>
+    <p>The public desk contains five recorded native reviews. Run the app locally with your own Clocked key to review another thread; the key stays on the server.</p>
+  </main>
+</body>
+</html>

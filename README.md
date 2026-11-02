@@ -4,6 +4,8 @@
 
 [Open the desk](https://blucca.github.io/counterparty-desk/)
 
+[Watch the short demo](https://blucca.github.io/counterparty-desk/demo.html) — real UI interactions, including an edited $249 thread reviewed through all three live Clocked endpoints. Fictional conversations and synthetic narration.
+
 A friendly reply can describe a different transaction from the offer. Counterparty Desk puts the original payment direction, the reply's understanding, and the exact words supporting the terms in one review surface.
 
 ## Try it

@@ -8,7 +8,11 @@ const files = {
   '/index.html': ['index.html', 'text/html; charset=utf-8'],
   '/style.css': ['style.css', 'text/css; charset=utf-8'],
   '/app.mjs': ['app.mjs', 'text/javascript; charset=utf-8'],
-  '/recorded.json': ['recorded.json', 'application/json; charset=utf-8']
+  '/recorded.json': ['recorded.json', 'application/json; charset=utf-8'],
+  '/demo.html': ['demo.html', 'text/html; charset=utf-8'],
+  '/counterparty-desk-demo.mp4': ['counterparty-desk-demo.mp4', 'video/mp4'],
+  '/counterparty-desk-demo.vtt': ['counterparty-desk-demo.vtt', 'text/vtt; charset=utf-8'],
+  '/demo-poster.jpg': ['demo-poster.jpg', 'image/jpeg']
 };
 const json = (res, status, value) => {
   res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' });
