@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#F3F7FF">
+    <meta name="description" content="Read who pays whom, what was offered, and what the reply accepts. A source-backed agreement desk powered by Clocked.">
+    <title>Counterparty Desk</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+    <script type="module" src="./app.mjs"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#conversation">Skip to conversation</a>
+    <header class="page-header">
+      <div class="shell header-inner">
+        <div class="brand">
+          <svg class="brand-mark" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+            <path d="M7 11H27L22 6M29 25H9L14 30" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M7 11V20M29 25V16" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/>
+          </svg>
+          <span>Counterparty Desk</span>
+        </div>
+        <div class="service-state">
+          <span class="service-dot" id="serviceDot" aria-hidden="true"></span>
+          <span id="serviceLabel">Recorded examples</span>
+          <span class="service-byline">Powered by Clocked</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="shell" id="desk">
+      <div class="thread-controls">
+        <div class="preset-control">
+          <label for="presetSelect">Try a recorded thread</label>
+          <select id="presetSelect" disabled>
+            <option>Loading recorded threads…</option>
+          </select>
+          <p class="preset-description" id="presetDescription">Fictional conversations, reviewed by Clocked.</p>
+        </div>
+        <div class="review-control">
+          <button class="button button-primary" id="reviewButton" type="button" disabled>
+            <span class="button-spinner" aria-hidden="true" hidden></span>
+            <svg class="review-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M13 3H4V17H16V6L13 3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+              <path d="M13 3V6H16M7 10H13M7 13H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <span id="reviewButtonText">Review thread</span>
+          </button>
+          <p id="liveNote">Checking live review…</p>
+        </div>
+      </div>
+
+      <div class="action-message" id="actionMessage" role="status" hidden></div>
+
+      <section class="payment-stage" id="paymentStage" data-kind="empty" aria-labelledby="paymentHeading">
+        <h1 class="sr-only" id="paymentHeading">Who pays whom</h1>
+        <div class="stage-status">
+          <span class="decision-tag" id="decisionTag">Ready for an offer</span>
+          <p id="stageContext">A payment direction, with the words behind it.</p>
+          <span class="stale-indicator" id="staleIndicator" hidden>Edits need review</span>
+        </div>
+        <div class="payment-grid">
+          <div class="party-identity party-ours">
+            <span class="party-role">Our side</span>
+            <h2 class="party-name" id="ourPartyName">Your studio</h2>
+          </div>
+          <div class="money-path" id="moneyPath" data-direction="unknown">
+            <div class="payment-price" id="paymentPrice">Add an offer</div>
+            <svg class="payment-arrow" viewBox="0 0 380 54" preserveAspectRatio="none" aria-hidden="true">
+              <path class="arrow-left" d="M380 21H32V5L0 27L32 49V33H380Z"/>
+              <path class="arrow-right" d="M0 21H348V5L380 27L348 49V33H0Z"/>
+              <path class="arrow-unknown" d="M5 27H375" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-dasharray="2 13"/>
+            </svg>
+            <p class="payment-label" id="paymentLabel">Proposed payment</p>
+            <div class="reply-path" id="replyPath" data-direction="unknown" hidden>
+              <span class="reply-path-label">Reply’s payment understanding</span>
+              <svg class="reply-arrow" viewBox="0 0 380 38" preserveAspectRatio="none" aria-hidden="true">
+                <path class="arrow-left" d="M373 19H9M26 5L9 19L26 33"/>
+                <path class="arrow-right" d="M7 19H371M354 5L371 19L354 33"/>
+              </svg>
+              <p class="sr-only" id="replyPaymentSentence"></p>
+            </div>
+          </div>
+          <div class="party-identity party-theirs">
+            <span class="party-role">Counterparty</span>
+            <h2 class="party-name" id="otherPartyName">Their business</h2>
+          </div>
+        </div>
+        <p class="sr-only" id="paymentSentence"></p>
+        <p class="stage-summary" id="stageSummary">Read the original offer and the reply together, before work starts.</p>
+      </section>
+
+      <div class="workspace">
+        <section class="conversation" id="conversation" aria-labelledby="conversationHeading">
+          <div class="section-heading">
+            <h2 id="conversationHeading">Conversation</h2>
+            <span class="section-note" id="messageCount">2 messages</span>
+          </div>
+          <p class="section-intro">The first message is the offer. The following messages are replies.</p>
+          <fieldset class="thread-fields" id="threadFields">
+            <legend class="sr-only">Edit the two parties and their messages</legend>
+            <div class="party-fields">
+              <label for="ourSideInput">Our side
+                <input id="ourSideInput" type="text" placeholder="Your studio" maxlength="100" autocomplete="off">
+              </label>
+              <label for="counterpartyInput">Counterparty
+                <input id="counterpartyInput" type="text" placeholder="Their business" maxlength="100" autocomplete="off">
+              </label>
+            </div>
+            <div class="messages" id="messages"></div>
+            <div class="message-actions">
+              <button class="button button-quiet" id="addMessageButton" type="button">
+                <span class="add-sign" aria-hidden="true">+</span> Add reply
+              </button>
+              <span class="message-limit" id="messageLimit">Up to 8 messages</span>
+            </div>
+          </fieldset>
+          <p class="editor-note">Your edits stay in this browser until you press Review thread.</p>
+        </section>
+
+        <section class="findings" aria-labelledby="findingsHeading">
+          <div class="section-heading findings-heading">
+            <h2 id="findingsHeading">What the thread supports</h2>
+            <button class="button button-copy" id="copyButton" type="button" disabled>
+              <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <rect x="7" y="7" width="9" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M12 7V3H3V13H7" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+              </svg>
+              <span id="copyButtonText">Copy terms</span>
+            </button>
+          </div>
+          <div class="reply-note" id="replyNote" data-kind="empty">
+            <p class="reply-title" id="replyTitle">Start with an offer and a reply.</p>
+            <p class="reply-detail" id="replyDetail">Choose a recorded thread to see its payment direction and source-backed terms.</p>
+          </div>
+          <dl class="terms-list" id="termsList">
+            <div class="term-row"><dt>Payment</dt><dd id="termPayment">Awaiting review</dd></div>
+            <div class="term-row"><dt>Price</dt><dd id="termPrice">Awaiting review</dd></div>
+            <div class="term-row"><dt>Work</dt><dd id="termScope">Awaiting review</dd></div>
+          </dl>
+          <p class="copy-note" id="copyNote">Copy is available for accepted, complete terms.</p>
+
+          <div class="evidence-section">
+            <div class="subsection-heading">
+              <h3>Quoted evidence</h3>
+              <span id="evidenceCount"></span>
+            </div>
+            <div class="evidence-list" id="evidenceList">
+              <p class="empty-evidence">A review links the terms to their exact words.</p>
+            </div>
+          </div>
+
+          <section class="source-reader" id="sourcePanel" aria-labelledby="sourceHeading">
+            <div class="subsection-heading">
+              <h3 id="sourceHeading">Exact source</h3>
+              <button class="text-button" id="clearHighlightButton" type="button" hidden>Clear highlight</button>
+            </div>
+            <p class="source-hint" id="sourceHint" aria-live="polite">Choose a quotation to find it in the reviewed thread.</p>
+            <pre class="source-text" id="sourceText" tabindex="0" aria-label="Full reviewed conversation source">The reviewed source will appear here.</pre>
+          </section>
+
+          <details class="native-disclosure" id="nativeDisclosure" hidden>
+            <summary>How this review was made</summary>
+            <p>Clocked reads the reply’s intent, locates exact quotations, and fills the payment terms. Each output changes this review.</p>
+            <ul class="endpoint-list" id="endpointList"></ul>
+            <details class="raw-disclosure">
+              <summary>View native response data</summary>
+              <pre id="rawData" tabindex="0" aria-label="Native response data"></pre>
+            </details>
+          </details>
+        </section>
+      </div>
+    </main>
+    <footer class="page-footer shell">
+      <p>Fictional examples. Real Clocked reviews.</p>
+      <p>A reading desk for the deal before the work.</p>
+    </footer>
+    <div class="sr-only" id="announcement" role="status" aria-live="polite"></div>
+  </body>
+</html>
