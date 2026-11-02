@@ -10,7 +10,7 @@ A friendly reply can describe a different transaction from the offer. Counterpar
 
 The public desk includes five recorded, fictional conversations with real Clocked API outputs:
 
-- An offer and reply that put different parties on the paying side.
+- A declined offer whose reply also reverses the paying side.
 - Explicit acceptance of the original price and work.
 - A request for information before a decision.
 - An enthusiastic counteroffer with the payment reversed.
@@ -38,7 +38,9 @@ The first release reads one original offer between two named parties and up to s
 2. **Extract** returns the original payment phrase, reply evidence, and any reply payment phrase with exact source positions. Selecting a citation highlights those Unicode code points in the source.
 3. **Fill** produces the sourced payer, payee, price, work scope, and original-offer acceptance judgment. Missing terms remain visible, and an open price keeps the terms note locked.
 
-The local contract checks that quoted values match their source positions and authors. Different payment directions, counteroffers, absent terms, and source gaps each have their own review state. The raw Clocked decision and field outputs remain inspectable beside the app's interpretation.
+The local contract checks that quoted values match their source positions in the original offer or the latest counterparty reply. Explicit rejection stops the offer while preserving both payment directions. Counteroffers, absent terms, and source gaps each have their own review state. The raw Clocked decision and field outputs remain inspectable beside the app's interpretation.
+
+When Clocked points repeated words into the other message, the desk relocates the quote only if the identical text occurs exactly once in the required message body. Adjusted evidence is marked `positionAdjusted`; the original endpoint positions stay in the raw output. A missing or ambiguous match leaves a source gap.
 
 The Python transport uses Clocked's documented JSON API. It is shared by fixture generation and the local server; Node's default HTTP client received a WAF HTML response during development.
 

@@ -43,9 +43,9 @@ const kinds = {
   },
   declined: {
     tag: 'Offer declined',
-    title: 'The reply declines the offer.',
-    detail: 'The original payment and work remain a proposal. Read the reply’s exact words below.',
-    summary: 'The original payment direction is a proposal. The reply declines the offer.',
+    title: 'Stop this offer.',
+    detail: 'The reply explicitly declines the original offer. Close this proposal; any new transaction needs its own accepted terms.',
+    summary: 'The reply declines the original offer. The payment paths preserve what each side understood.',
   },
   conflict: {
     tag: 'Payment directions differ',
@@ -255,9 +255,6 @@ function renderReview() {
     ui.replyTitle.textContent = 'The reply proposes different terms.';
     ui.replyDetail.textContent = 'Review the changed price or work and ask both parties to accept the same terms.';
     ui.stageSummary.textContent = 'The arrow follows the original offer. The reply proposes a change to its terms.';
-  } else if (kind === 'conflict' && review.status === 'declined') {
-    ui.replyTitle.textContent = 'The reply declines a different deal.';
-    ui.replyDetail.textContent = 'The reply declines the offer while reversing who pays whom. Clarify the payment direction before discussing acceptance.';
   } else if (kind === 'conflict' && review.status === 'counteroffer') {
     ui.replyTitle.textContent = 'The reply reverses the proposed payment.';
     ui.replyDetail.textContent = 'This is a counteroffer with the payer on the other side. Resolve the direction before recording agreed terms.';

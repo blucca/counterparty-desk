@@ -32,12 +32,13 @@ export function buildRequests(rawInput) {
   const input = normalizeInput(rawInput);
   const text = sourceText(input);
   const responder = input.messages.find(message => message.author !== input.messages[0].author).author;
+  const replyNumber = input.messages.findLastIndex(message => message.author === responder) + 1;
   const paymentOptions = {
     [input.ourSide]: `${input.ourSide} pays ${input.counterparty}.`,
     [input.counterparty]: `${input.counterparty} pays ${input.ourSide}.`,
     'not established': 'No payer is established in the message being assessed.'
   };
-  const policy = `The first message is the original offer. Assess that transaction. The latest reply from ${responder} is the response. A request for information leaves acceptance open. A different price, scope, or payment direction is a counteroffer. Copy evidence from the source; preserve absent terms as null.`;
+  const policy = `Message 1 is the original offer. Assess that transaction. Message ${replyNumber}, from ${responder}, is the latest response. Explicit rejection or declining the original offer takes priority: choose declined even when the reply also describes a different payment direction. Otherwise a different price, scope, or payment direction is a counteroffer. A request for information leaves acceptance open. Quote original terms only from Message 1 and reply evidence only from Message ${replyNumber}; preserve absent terms as null.`;
   return {
     decide: {
       state: text, instructions: policy,
@@ -46,7 +47,7 @@ export function buildRequests(rawInput) {
           agreed: 'Explicitly accepts the original work, price, and payment direction.',
           clarify: 'Asks questions, postpones a decision, or leaves acceptance open.',
           declined: 'Rejects or declines the original offer.',
-          counteroffer: 'Proposes different terms or understands the payment in the opposite direction.'
+          counteroffer: 'Proposes different terms or understands payment in the opposite direction, with acceptance of the original offer still open. An explicit rejection takes the declined route.'
         } },
         payer: { type: 'choice', instructions: 'Who is proposed to pay in the first message, the original offer?', criteria: paymentOptions },
         reply_payer: { type: 'choice', instructions: `Who is understood to pay in the latest message from ${responder}? Read this reply itself. If it gives no payment direction, choose not established.`, criteria: paymentOptions }
@@ -57,7 +58,7 @@ export function buildRequests(rawInput) {
       fields: {
         payment_clause: 'The original offer\'s short phrase stating who pays whom and the price, ending at the currency.',
         reply_evidence: `A short verbatim phrase in ${responder}'s latest reply accepting, declining, or postponing the original offer; at most twelve words.`,
-        reply_payment_clause: `A short phrase in ${responder}'s latest reply naming who will pay whom and the price. Return null when absent.`
+        reply_payment_clause: `A short phrase only in Message ${replyNumber}, from ${responder}, naming who will pay whom and the price. Its positions must point into that reply, including when Message 1 contains the same words. Return null when absent.`
       }
     },
     fill: {
@@ -111,21 +112,35 @@ export function reviewRecords(rawInput, records) {
   const evidence = [];
   const invalid = [];
   const authors = [...source.matchAll(/Message \d+\. From: ([^\n]+)\.\n/g)].map(match => ({
-    start: Array.from(source.slice(0, match.index)).length, author: match[1]
+    start: Array.from(source.slice(0, match.index)).length,
+    bodyStart: Array.from(source.slice(0, match.index + match[0].length)).length,
+    author: match[1]
   }));
-  const authorAt = start => {
-    return authors.filter(author => author.start <= start).at(-1)?.author || null;
+  const messageAt = start => {
+    return authors.findLastIndex(author => author.start <= start);
   };
-  const read = (id, label, field) => {
-    const span = verbatim(source, field);
+  const replyIndex = input.messages.findLastIndex(message => message.author !== input.messages[0].author);
+  const read = (id, label, field, messageIndex = 0) => {
+    let span = verbatim(source, field);
+    // Repeated words can match exactly while pointing into the wrong message.
+    // Relocate only a unique, identical quote inside the required message body.
+    // Ambiguous repetitions remain a source gap; broader quote resolution is future scope.
+    if (span && (messageAt(span.start) !== messageIndex || messageAt(span.end - 1) !== messageIndex)) {
+      const body = input.messages[messageIndex].text;
+      const at = body.indexOf(span.value);
+      if (at >= 0 && body.lastIndexOf(span.value) === at) {
+        const start = authors[messageIndex].bodyStart + Array.from(body.slice(0, at)).length;
+        span = { ...span, start, end: start + Array.from(span.value).length, positionAdjusted: true };
+      } else span = null;
+    }
     if (field?.value !== null && field?.value !== undefined && !span) invalid.push(label);
-    if (span) evidence.push({ id, label, ...span, author: authorAt(span.start) });
+    if (span) evidence.push({ id, label, ...span, author: authors[messageIndex].author });
     return span?.value || null;
   };
   const extracted = records.extract.response.fields || {};
   read('payment', 'Original payment', extracted.payment_clause);
-  const replyEvidence = read('reply', 'Reply', extracted.reply_evidence);
-  read('reply-payment', 'Reply payment', extracted.reply_payment_clause);
+  const replyEvidence = read('reply', 'Reply', extracted.reply_evidence, replyIndex);
+  read('reply-payment', 'Reply payment', extracted.reply_payment_clause, replyIndex);
   const filled = records.fill.response.fields || {};
   const filledPayer = read('payer', 'Payer', filled.payer);
   const payee = read('payee', 'Payee', filled.payee);
@@ -141,9 +156,9 @@ export function reviewRecords(rawInput, records) {
     && filledPayer === payer && price && /\d/.test(price) && scope && !invalid.length);
   const directionConflict = Boolean(payer && replyPayer && payer !== replyPayer);
   let kind = 'clarify';
-  if (!complete || (status === 'agreed' && accepted && !replyEvidence)) kind = 'incomplete';
+  if (status === 'declined') kind = 'declined';
+  else if (!complete || (status === 'agreed' && accepted && !replyEvidence)) kind = 'incomplete';
   else if (directionConflict || status === 'counteroffer') kind = 'conflict';
-  else if (status === 'declined') kind = 'declined';
   else if (status === 'agreed' && accepted) kind = 'agreed';
   return {
     kind, status, payer, payee, replyPayer, price, scope, accepted, complete,

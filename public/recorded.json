@@ -1,8 +1,8 @@
 [
   {
     "id": "direction-conflict",
-    "title": "Two different deals",
-    "description": "The offer and the reply put different parties on the paying side.",
+    "title": "A declined, reversed deal",
+    "description": "The reply reverses who pays whom and explicitly declines the original offer.",
     "input": {
       "ourSide": "Loopline",
       "counterparty": "NorthWorks",
@@ -18,8 +18,8 @@
       ]
     },
     "review": {
-      "kind": "conflict",
-      "status": "counteroffer",
+      "kind": "declined",
+      "status": "declined",
       "payer": "NorthWorks",
       "payee": "Loopline",
       "replyPayer": "Loopline",
@@ -86,10 +86,10 @@
       "issues": [],
       "raw": {
         "decide": {
-          "requestId": "2e03fa18-537a-4481-8806-c9573f8a2976",
+          "requestId": "a2a2156b-f59c-44d4-8aa8-ff53a49138a5",
           "request": {
             "state": "Message 1. From: Loopline.\nSubject: Workflow repair 🧭\nOffer: Loopline will repair one workflow. NorthWorks will pay Loopline $199 USD after the agreed checks pass. Delivery: two business days after the sanitized exports arrive.\n\nMessage 2. From: NorthWorks.\nI thought Loopline would pay NorthWorks for our repair work. NorthWorks declines your $199 offer.",
-            "instructions": "The first message is the original offer. Assess that transaction. The latest reply from NorthWorks is the response. A request for information leaves acceptance open. A different price, scope, or payment direction is a counteroffer. Copy evidence from the source; preserve absent terms as null.",
+            "instructions": "Message 1 is the original offer. Assess that transaction. Message 2, from NorthWorks, is the latest response. Explicit rejection or declining the original offer takes priority: choose declined even when the reply also describes a different payment direction. Otherwise a different price, scope, or payment direction is a counteroffer. A request for information leaves acceptance open. Quote original terms only from Message 1 and reply evidence only from Message 2; preserve absent terms as null.",
             "questions": {
               "status": {
                 "type": "choice",
@@ -98,7 +98,7 @@
                   "agreed": "Explicitly accepts the original work, price, and payment direction.",
                   "clarify": "Asks questions, postpones a decision, or leaves acceptance open.",
                   "declined": "Rejects or declines the original offer.",
-                  "counteroffer": "Proposes different terms or understands the payment in the opposite direction."
+                  "counteroffer": "Proposes different terms or understands payment in the opposite direction, with acceptance of the original offer still open. An explicit rejection takes the declined route."
                 }
               },
               "payer": {
@@ -126,34 +126,34 @@
             "answers": {
               "status": {
                 "type": "choice",
-                "choice": "counteroffer",
+                "choice": "declined",
                 "probabilities": {
-                  "agreed": 0.02,
-                  "clarify": 0.0276,
-                  "declined": 0.2682,
-                  "counteroffer": 0.6841
+                  "agreed": 0.0015,
+                  "clarify": 0.0011,
+                  "declined": 0.9956,
+                  "counteroffer": 0.0018
                 },
-                "confidence": 0.5788
+                "confidence": 0.9942
               },
               "payer": {
                 "type": "choice",
                 "choice": "NorthWorks",
                 "probabilities": {
-                  "Loopline": 0.0036,
-                  "NorthWorks": 0.9936,
-                  "not established": 0.0028
+                  "Loopline": 0.0032,
+                  "NorthWorks": 0.9926,
+                  "not established": 0.0042
                 },
-                "confidence": 0.9905
+                "confidence": 0.9889
               },
               "reply_payer": {
                 "type": "choice",
                 "choice": "Loopline",
                 "probabilities": {
-                  "Loopline": 0.9861,
-                  "NorthWorks": 0.0063,
-                  "not established": 0.0077
+                  "Loopline": 0.9403,
+                  "NorthWorks": 0.0189,
+                  "not established": 0.0408
                 },
-                "confidence": 0.9791
+                "confidence": 0.9104
               }
             }
           }
@@ -319,9 +319,10 @@
           "id": "reply-payment",
           "label": "Reply payment",
           "value": "NorthWorks will pay Loopline $199 USD",
-          "start": 96,
-          "end": 133,
-          "author": "Loopline"
+          "start": 309,
+          "end": 346,
+          "positionAdjusted": true,
+          "author": "NorthWorks"
         },
         {
           "id": "payer",
@@ -438,14 +439,14 @@
           }
         },
         "extract": {
-          "requestId": "d5e1eb13-9fd2-4fba-9664-d57f3626c2c7",
+          "requestId": "4332a2fe-46ba-48e7-98ab-531ff8d239db",
           "request": {
             "text": "Message 1. From: Loopline.\nSubject: Workflow repair 🧭\nOffer: Loopline will repair one workflow. NorthWorks will pay Loopline $199 USD after the agreed checks pass. Delivery: two business days after the sanitized exports arrive.\n\nMessage 2. From: NorthWorks.\nNorthWorks accepts your one-workflow repair offer. NorthWorks will pay Loopline $199 USD after the agreed checks pass. Send the two-export upload instructions.",
-            "instructions": "The first message is the original offer. Assess that transaction. The latest reply from NorthWorks is the response. A request for information leaves acceptance open. A different price, scope, or payment direction is a counteroffer. Copy evidence from the source; preserve absent terms as null.",
+            "instructions": "Message 1 is the original offer. Assess that transaction. Message 2, from NorthWorks, is the latest response. Explicit rejection or declining the original offer takes priority: choose declined even when the reply also describes a different payment direction. Otherwise a different price, scope, or payment direction is a counteroffer. A request for information leaves acceptance open. Quote original terms only from Message 1 and reply evidence only from Message 2; preserve absent terms as null.",
             "fields": {
               "payment_clause": "The original offer's short phrase stating who pays whom and the price, ending at the currency.",
               "reply_evidence": "A short verbatim phrase in NorthWorks's latest reply accepting, declining, or postponing the original offer; at most twelve words.",
-              "reply_payment_clause": "A short phrase in NorthWorks's latest reply naming who will pay whom and the price. Return null when absent."
+              "reply_payment_clause": "A short phrase only in Message 2, from NorthWorks, naming who will pay whom and the price. Its positions must point into that reply, including when Message 1 contains the same words. Return null when absent."
             }
           },
           "response": {
@@ -455,22 +456,22 @@
                 "value": "NorthWorks will pay Loopline $199 USD",
                 "start": 96,
                 "end": 133,
-                "confidence": 0.999999999268727,
-                "p_verify": 0.999999999268727
+                "confidence": 0.9999999991912367,
+                "p_verify": 0.9999999991912367
               },
               "reply_evidence": {
                 "value": "NorthWorks accepts your one-workflow repair offer",
                 "start": 258,
                 "end": 307,
-                "confidence": 0.9999999995292905,
-                "p_verify": 0.9999999995292905
+                "confidence": 0.9999999998373539,
+                "p_verify": 0.9999999998373539
               },
               "reply_payment_clause": {
                 "value": "NorthWorks will pay Loopline $199 USD",
                 "start": 96,
                 "end": 133,
-                "confidence": 0.9999999985282848,
-                "p_verify": 0.9999999985282848
+                "confidence": 0.999999995058866,
+                "p_verify": 0.999999995058866
               }
             }
           }
